@@ -1,0 +1,44 @@
+//IR Door Lock 
+#include <IRremote.h>
+#include <Servo.h>
+int RECV_PIN = 3; //This Pin should be PWM
+
+IRrecv irrecv(RECV_PIN);
+
+decode_results results;
+
+Servo myservo;  // create servo object to control a servo
+int pos = 0;    // variable to store the servo position
+
+void setup()
+{ 
+  Serial.begin(9600);
+  irrecv.enableIRIn(); // Start the receiver
+    
+  myservo.attach(9);
+}
+void loop() {
+  
+  if (irrecv.decode(&results)) {
+     	switch(results.value)
+      {        
+        case 16582903:	Serial.println("1"); 	// Button 1
+        		for (pos = 0; pos <= 180; pos += 1) { 	// goes from 0 degrees to 180 degrees
+    			// in steps of 1 degree
+    			myservo.write(pos);              	// tell servo to go to position in variable 'pos'
+    			delay(15);                       	// waits 15 ms for the servo to reach the position
+  			}
+	          	break;
+          
+        case 16615543:  Serial.println("2"); 	// Button 2  
+                        for (pos = 180; pos >= 0; pos -= 1) { 	// goes from 180 degrees to 0 degrees
+    			myservo.write(pos);              	// tell servo to go to position in variable 'pos'
+    			delay(15);                       	// waits 15 ms for the servo to reach the position
+  			}
+	                break;          
+         
+        default: Serial.println(results.value);     
+      }  
+    irrecv.resume(); // Receive the next value
+  } 
+}
